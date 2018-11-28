@@ -1,0 +1,45 @@
+*{
+  margin:0;
+}
+
+body{
+  background-color:#E0E0E0;
+}
+
+.guide{
+  text-align:center;
+  font-size:30px;
+  font-family:arial;
+  color:#8F8F8F;
+  margin:30px 0 30px 0;
+}
+
+.clock{
+  font-size:20px;
+  font-family:arial;
+  color:#8F8F8F;
+  position:absolute;
+  right:5%;
+  top:35px;
+}
+
+.credit{
+  font-size:15px;
+  font-family:arial;
+  color:#E0E0E0;
+  position:absolute;
+  left:5%;
+  top:37px;
+}
+
+.game{
+  text-align:center;
+  background-color:#FFF;
+  margin:0 auto;
+  width:1080px;
+  height:720px;
+  border-style:solid;
+  border-width:5px;
+  border-color:#6F6F6F;
+  display:grid;
+}
