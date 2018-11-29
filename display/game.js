@@ -49,54 +49,86 @@ function update(){
 				return false;
 			};
 			if(!duplicate(vertices,vertex)){
-				vertices.push(vertex);
 
 				// Get Radians
-				var dx=vertex[0]-mouse[0];
-				var dy=vertex[1]-mouse[1];
-				var curr_angle=Math.atan(Math.abs(dy/dx));
-				if(dx*dy<0) curr_angle=Math.PI/2-curr_angle; // Quadrant I & III
-				var multiplier=0;
-				if(dx<0) multiplier++; // Quadrant II & III
-				if(dy<0) multiplier++; // Quadrant III & IV
-				if(dx>0&&dy<0) multiplier+=2; // Quadrant IV
-				curr_angle+=Math.PI/2*multiplier;
+				var curr_angle=get_radians(mouse,vertex);
+				vertices.push(vertex);
 
 				// Get Offset
 				var get_vertex=function(radian,vertex){
-					var dx=vertex[0]+10;
-					return [dx,Math.tan(radian)*dx]
+					var dx=10;
+					if(radians%Math.PI==0) return null;
+					return [vertex[0]+dx,vertex[1]+Math.tan(radian)*dx]
 				};
-				//vertices.push(get_vertex(curr_angle,vertex));
-				//vertices.push(get_vertex(curr_angle-0.00001,vertex));
+
+				vertices.push(get_vertex(curr_angle+0.001,vertex));
+				vertices.push(get_vertex(curr_angle-0.001,vertex));
 			}
 		});
 	});
 
+	//Sort Counter-Clockwise
+	vertices=vertices.sort(function(a,b){return get_radians(mouse,a)-get_radians(mouse,b)});
+
+	var polygon=[];
 	vertices.forEach(function(vertex){
 
 		// Closest
-			var min_cross=null;
-			for(var i=0;i<shapes.length;i++){
-				var sides=shapes[i].length;
-				for(var j=0;j<sides;j++){
-					var temp_cross=get_intersect([mouse,vertex],[shapes[i][j%sides],shapes[i][(j+1)%sides]]);
-					if(temp_cross==null) continue;
-					if(min_cross==null||distance(mouse,temp_cross)<distance(mouse,min_cross)){
-						min_cross=temp_cross;
-					}
+		var min_cross=null;
+		for(var i=0;i<shapes.length;i++){
+			var sides=shapes[i].length;
+			for(var j=0;j<sides;j++){
+				var temp_cross=get_intersect([mouse,vertex],[shapes[i][j%sides],shapes[i][(j+1)%sides]]);
+				if(temp_cross==null) continue;
+				if(min_cross==null||distance(mouse,temp_cross)<distance(mouse,min_cross)){
+					min_cross=temp_cross;
 				}
 			}
-			// Draw Closest
-			ctx.beginPath()
-			ctx.moveTo(mouse[0],mouse[1]);
-			ctx.lineTo(min_cross[0],min_cross[1]);
-			ctx.strokeStyle="#00F";
-			ctx.stroke();
+		}
+
+		if(min_cross!=null) polygon.push(min_cross);
+	});
+
+	//Draw Polygon
+	/*ctx.beginPath();
+	ctx.moveTo(polygon[0][0],polygon[0][1]);
+	for(var i=1;i<polygon.length;i++){
+		ctx.lineTo(polygon[i][0],polygon[i][1]);
+		ctx.fillStyle="#00F";
+		ctx.fill();
+	}*/
+
+	for(var i=0;i<polygon.length-1;i++){
+		ctx.beginPath();
+		ctx.moveTo(polygon[i][0],polygon[i][1]);
+		ctx.lineTo(polygon[i+1][0],polygon[i+1][1]);
+		ctx.strokeStyle="#00F";
+		ctx.stroke();
+	}
+
+	polygon.forEach(function(vertex){
+		ctx.beginPath();
+		ctx.moveTo(mouse[0],mouse[1]);
+		ctx.lineTo(vertex[0],vertex[1]);
+		ctx.strokeStyle="#F00";
+		ctx.stroke();
 	});
 
 	// Draw Shapes
 	draw_shapes(shapes);
+}
+
+function get_radians(origin,to){
+	var dx=to[0]-origin[0];
+	var dy=to[1]-origin[1];
+	var curr_angle=Math.atan(Math.abs(dy/dx));
+	if(dx*dy<0) curr_angle=Math.PI/2-curr_angle; // Quadrant I & III
+	var multiplier=0;
+	if(dx<0) multiplier++; // Quadrant II & III
+	if(dy<0) multiplier++; // Quadrant III & IV
+	if(dx>0&&dy<0) multiplier+=2; // Quadrant IV
+	curr_angle+=Math.PI/2*multiplier;
+	return curr_angle;
 }
 
 function draw_shapes(shapes){
