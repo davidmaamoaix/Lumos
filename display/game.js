@@ -9,7 +9,7 @@ function start(){
 	ctx=canvas.getContext('2d');
 	canvas.width=1080;
 	canvas.height=720;
-	ctx.fillStyle='#FFF';
+	ctx.fillStyle='#333';
 	ctx.fillRect(0,0,1080,720);
 	setInterval(update,40);
 }
@@ -32,8 +32,8 @@ function update(){
 
 				// Level				
 				[[100,100],[200,150],[100,250]],
-				[[200,200],[350,450],[275,500],[150,350]],
-				[[700,300],[900,300],[900,400],[700,400]]]; // [x1 y1 x2 y2]
+				[[300,200],[450,450],[375,500],[250,350]],
+				[[700,300],[900,300],[1000,400],[800,400]]]; // [x1 y1 x2 y2]
 
 	// Def Ray
 	var mid=[canvas.width/2,canvas.height/2];
@@ -52,23 +52,23 @@ function update(){
 
 				// Get Radians
 				var curr_angle=get_radians(mouse,vertex);
-				vertices.push(vertex);
+				vertices.push(vertex.concat([curr_angle]));
 
 				// Get Offset
-				var get_vertex=function(radian,vertex){
+				var get_vertex=function(radians,vertex){
 					var dx=10;
-					if(radians%Math.PI==0) return null;
-					return [vertex[0]+dx,vertex[1]+Math.tan(radian)*dx]
+					return [vertex[0]+dx,vertex[1]+Math.tan(radians)*dx]
 				};
 
-				vertices.push(get_vertex(curr_angle+0.001,vertex));
-				vertices.push(get_vertex(curr_angle-0.001,vertex));
+				var offset=[curr_angle-0.001,curr_angle+0.001];
+				vertices.push([mouse[0]+Math.cos(offset[0]),mouse[1]+Math.sin(offset[0]),offset[0]]);
+				vertices.push([mouse[0]+Math.cos(offset[1]),mouse[1]+Math.sin(offset[1]),offset[1]]);
 			}
 		});
 	});
 
 	//Sort Counter-Clockwise
-	vertices=vertices.sort(function(a,b){return get_radians(mouse,a)-get_radians(mouse,b)});
+	vertices=vertices.sort(function(a,b){return a[2]-b[2]});
 
 	var polygon=[];
 	vertices.forEach(function(vertex){
@@ -90,45 +90,20 @@ function update(){
 	});
 
 	//Draw Polygon
-	/*ctx.beginPath();
+	ctx.beginPath();
 	ctx.moveTo(polygon[0][0],polygon[0][1]);
 	for(var i=1;i<polygon.length;i++){
 		ctx.lineTo(polygon[i][0],polygon[i][1]);
-		ctx.fillStyle="#00F";
-		ctx.fill();
-	}*/
-
-	for(var i=0;i<polygon.length-1;i++){
-		ctx.beginPath();
-		ctx.moveTo(polygon[i][0],polygon[i][1]);
-		ctx.lineTo(polygon[i+1][0],polygon[i+1][1]);
-		ctx.strokeStyle="#00F";
-		ctx.stroke();
 	}
-
-	polygon.forEach(function(vertex){
-		ctx.beginPath();
-		ctx.moveTo(mouse[0],mouse[1]);
-		ctx.lineTo(vertex[0],vertex[1]);
-		ctx.strokeStyle="#F00";
-		ctx.stroke();
-	});
+	ctx.fillStyle="#FFF";
+	ctx.fill();
 
 	// Draw Shapes
 	draw_shapes(shapes);
 }
 
 function get_radians(origin,to){
-	var dx=to[0]-origin[0];
-	var dy=to[1]-origin[1];
-	var curr_angle=Math.atan(Math.abs(dy/dx));
-	if(dx*dy<0) curr_angle=Math.PI/2-curr_angle; // Quadrant I & III
-	var multiplier=0;
-	if(dx<0) multiplier++; // Quadrant II & III
-	if(dy<0) multiplier++; // Quadrant III & IV
-	if(dx>0&&dy<0) multiplier+=2; // Quadrant IV
-	curr_angle+=Math.PI/2*multiplier;
-	return curr_angle;
+	return Math.atan2(to[1]-origin[1],to[0]-origin[0]);
 }
 
 function draw_shapes(shapes){
