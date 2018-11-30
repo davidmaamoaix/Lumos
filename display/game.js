@@ -2,7 +2,7 @@ var ctx;
 var mouse;
 var shapes;
 var doesUpdate;
-var canvas=document.getElementById('game');;
+var canvas=document.getElementById('game');
 
 function start(){
 	mouse=[0,0]
@@ -28,7 +28,7 @@ function update(){
 				// Border
 		[[0,0],[1080,0],[1080,1],[0,1]],
 		[[0,0],[0,720],[1,720],[1,0]],
-		[[0,720],[1080,720],[1080,719],[0,719]],
+		[[0,720],[1080,720],[1080,650],[0,650]],
 		[[1080,0],[1080,720],[1079,720],[1079,0]],
 
 		// Level
@@ -41,7 +41,7 @@ function update(){
 		[[930,135],[960,135],[980,155],[930,155],[930,200],[960,200],[980,220],[980,265],[960,285],
 		[930,285],[910,265],[960,265],[960,220],[930,220],[910,200],[910,155]]]; // S (910-980)
 
-	
+
 	var vertices=get_vertices(mouse);
 	draw_polygon(vertices,"#FFF");
 
@@ -53,6 +53,9 @@ function update(){
 		var vertices=get_vertices([mouse[0]+(offset_len*Math.cos(i)),mouse[1]+(offset_len*Math.sin(i))]);
 		draw_polygon(vertices,"rgba(255,255,255,"+(gradient_alpha/offset_count)+")");
 	}
+
+	// Draw Player
+	draw_player(ctx);
 
 	/*ctx.beginPath();
 	polygon.forEach(function(vertex){
