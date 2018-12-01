@@ -1,11 +1,13 @@
 var ctx;
 var mouse;
+var items;
 var shapes;
 var doesUpdate;
 var canvas=document.getElementById('game');
 
 function start(){
-	mouse=[0,0]
+	mouse=[0,0];
+	items=[];
 	doesUpdate=true;
 	ctx=canvas.getContext('2d');
 	canvas.width=1080;
@@ -16,9 +18,6 @@ function start(){
 }
 
 function update(){
-
-	if(doesUpdate) doesUpdate=false;
-	else return;
 
 	// Init
 	ctx.clearRect(0,0,canvas.width,canvas.height);
@@ -54,8 +53,8 @@ function update(){
 		draw_polygon(vertices,"rgba(255,255,255,"+(gradient_alpha/offset_count)+")");
 	}
 
-	// Draw Player
-	draw_player(ctx);
+	// Draw Items
+	draw_items();
 
 	/*ctx.beginPath();
 	polygon.forEach(function(vertex){
@@ -83,8 +82,17 @@ function draw_shapes(shapes){
 			ctx.lineTo(shape[j%num_points][0],shape[j%num_points][1]);
 		}
 	}
+	ctx.lineWidth=2;
 	ctx.strokeStyle="#FFF";
 	ctx.stroke();
+	ctx.fillStyle="#323232";
+	ctx.fill();
+}
+
+function collide(point){
+	if(point[0]<0||point[0]>1079||point[1]<0||point[1]>719) return true;
+	var pixel=ctx.getImageData(point[0],point[1],1,1).data[0];
+	return pixel==50;
 }
 
 function draw_polygon(points,style){
@@ -96,6 +104,23 @@ function draw_polygon(points,style){
 	}
 	ctx.fillStyle=style;
 	ctx.fill();
+}
+
+function add_item(draw_func){
+	items.push(draw_func);
+}
+
+function draw_items(){
+	ctx.globalCompositeOperation="source-atop";
+	items.forEach(function(func){
+		func(ctx,false);
+	});
+	ctx.globalCompositeOperation="destination-over";
+	ctx.fillStyle="#FFF";
+	items.forEach(function(func){
+		func(ctx,true);
+	});
+	ctx.globalCompositeOperation="source-over";
 }
 
 function get_vertices(mouse_pos){

@@ -20,3 +20,11 @@ function get_intersect(ray,line){
 function distance(a,b){
 	return Math.sqrt((a[0]-b[0])**2+(a[1]-b[1])**2);
 }
+
+function add(a,b){
+	return [a[0]+b[0],a[1]+b[1]];
+}
+
+function scale(vec,scaler){
+	return [vec[0]*scaler,vec[1]*scaler];
+}
