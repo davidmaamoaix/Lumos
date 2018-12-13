@@ -56,14 +56,6 @@ function update(){
 	// Draw Items
 	draw_items();
 
-	/*ctx.beginPath();
-	polygon.forEach(function(vertex){
-		ctx.moveTo(mouse[0],mouse[1]);
-		ctx.lineTo(vertex[0],vertex[1]);
-		ctx.strokeStyle="#F00";
-		ctx.stroke();
-	});*/
-
 	// Draw Shapes
 	draw_shapes(shapes);
 }
